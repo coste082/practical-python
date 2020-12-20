@@ -2,18 +2,18 @@
 #
 # Exercise 1.27
 
-import csv
-def portfolio_cost(datafile='Work/Data/portfolio.csv'):
-    total = 0
-    with open(datafile, 'rt') as f:
-        headers = [i.rstrip() for i in next(f).split(',')]
-        for rowno,row in enumerate(f):
-            row = [i.rstrip() for i in row.split(',')]
-            record = dict(zip(headers,row))
-            try:
-                total += int(record['shares'])*float(record['price'].rstrip())
-            except ValueError:
-                print(f'Row  {rowno}: Bad row: {row}',end='')
+from fileparse import parse_csv
+
+def portfolio_cost(datafile='Data/portfolio.csv'):
+    portfolio = parse_csv(datafile)
+    total = sum([i['shares']*i['price'] for i in portfolio])
     print("\nTotal cost: ${:.2f}".format(total))
 
-portfolio_cost('Work/Data/portfoliodate.csv')
+def main(args):
+    if len(args) != 2:
+        raise SystemExit('Usage: {} portfoliofile pricefile'.format(sys.argv[0]))
+    portfolio_cost(args[1])
+
+if __name__ == '__main__':
+    import sys
+    main(sys.argv)
