@@ -3,11 +3,13 @@
 # Exercise 1.27
 
 from fileparse import parse_csv
+from stock import Stock
+import report
 
 def portfolio_cost(datafile='Data/portfolio.csv'):
-    portfolio = parse_csv(datafile)
-    total = sum([i['shares']*i['price'] for i in portfolio])
-    print("\nTotal cost: ${:.2f}".format(total))
+    with open(datafile,'rt') as f:
+        portfolio = report.read_portfolio(datafile)
+        return portfolio.total_cost
 
 def main(args):
     if len(args) != 2:

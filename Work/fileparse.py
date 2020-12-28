@@ -25,6 +25,7 @@ def parse_csv(lines,select=None,types=None,has_headers=True,delimiter=','):
     else:
         select = headers
         headers_select = headers
+
     type_conversions = [type_dict[i] for i in headers_select]
     indices = [headers.index(i) for i in headers if i in select]
     for row in rows:
@@ -35,6 +36,3 @@ def parse_csv(lines,select=None,types=None,has_headers=True,delimiter=','):
         record = dict(zip(headers_select,row_select))
         records.append(record)
     return records
-
-with gzip.open('Data/portfolio.csv.gz','rt') as file:
-    parse_csv(file)

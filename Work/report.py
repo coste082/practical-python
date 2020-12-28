@@ -4,50 +4,38 @@
 import pprint
 import csv
 from fileparse import parse_csv
+from stock import Stock
+from portfolio import Portfolio
+import tableformat
 
-def print_portfolio(portfolio):
+def print_portfolio(portfolio,formatter):
     '''
     Prints portfolio of stocks in nice-looking format.
     '''
-    headers = [i.rstrip() for i in portfolio[0].keys()]
-    for i,d in enumerate(headers):
-        print('{:>12s}'.format(d),end=' ')
-    print('')
-    for i in enumerate(headers):
-        print('{:->12s}'.format('-'),end=' ')
-    print('')
-    for i,r in enumerate(portfolio):
-        for j in r.values():
-            if isinstance(j,str):
-                print('{:>12s}'.format(j),end = ' ')
-            elif isinstance(j,int):
-                print('{:>12d}'.format(j),end = ' ')
-            elif isinstance(j,float):
-                print('{:>12.2f}'.format(j),end = ' ')
-        print('')
+    headers = [i for i in dir(portfolio[0]) if str(i) in ['name','price','shares',
+                                                          'current_price','change']]
+    if len(headers) == 5:
+        headers = [headers[i] for i in [2,4,3,1,0]]
+    else:
+        headers = [headers[i] for i in [0,2,1]]
+    formatter.headings(headers)
+    for row in portfolio:
+        formatter.row([getattr(row,k) for k in headers])
 
 def read_portfolio_to_tuples(datafile='Data/portfolio.csv'):
     '''
     Reads csv file to list of tuples.
     '''
-    portfolio = []
     with open(datafile, 'rt') as f:
-        f_csv = csv.reader(f)
-        headers = next(f_csv)
-        for line in f:
-            holding = (row[0],int(row[1]),float(row[2]))
-            portfolio.append(holding)
+        port = Portfolio.from_csv(lines)
     return portfolio
 
-def read_portfolio_to_dicts(datafile='Data/portfolio.csv',print_data='n'):
+def read_portfolio(datafile='Data/portfolio.csv',print_data='n',**opts):
     '''
     Reads csv to a list of dictionaries. Can be used with variable column inputs.
     '''
-    with open(datafile,'rt') as file:
-        portfolio = parse_csv(file)
-        if print_data == 'y':
-            print_portfolio(portfolio)
-        return portfolio
+    with open(datafile) as lines:
+        return Portfolio.from_csv(lines, **opts)
 
 def read_prices(datafile:str='Data/prices.csv') -> dict:
     '''
@@ -55,29 +43,30 @@ def read_prices(datafile:str='Data/prices.csv') -> dict:
     '''
     with open(datafile,'rt') as file:    
         price_tuples = parse_csv(file,types=[str,float],has_headers=False)
-        price_dict = {}         #can I make this dictionary population a one liner?
+        price_dict = {}  
         for i in price_tuples:
             if i:
                 price_dict[i[0]] = i[1]
         return price_dict
 
-def portfolio_report(potfolio_file,prices_file,print_data='n'):
+
+def portfolio_report(potfolio_file,prices_file,print_data='n',fmt='txt'):
     '''
     Add current stock prices to portfolio and calculate price change
     '''
-    portfolio = read_portfolio_to_dicts(potfolio_file)
+    portfolio = read_portfolio(potfolio_file)
     prices = read_prices(prices_file)
-    for i in portfolio:
-        i['current_price'] = prices[i['name']]
-        i['price_change'] = prices[i['name']] - i['price']
+    for s in portfolio:
+        s.update_prices(prices[s.name])
     if print_data == 'y':
-        print_portfolio(portfolio)
+        formatter = tableformat.create_formatter(fmt)
+        print_portfolio(portfolio,formatter)
     return portfolio
 
 def main(args):
-    if len(args) != 3:
-        raise SystemExit('Usage: {} portfoliofile pricefile'.format(sys.argv[0]))
-    portfolio_report(args[1],args[2],print_data='y')
+    if len(args) != 4:
+        raise SystemExit('Usage: {} portfoliofile pricefile format'.format(sys.argv[0]))
+    portfolio_report(args[1],args[2],print_data='y',fmt=args[3])
 
 if __name__ == '__main__':
     import sys
