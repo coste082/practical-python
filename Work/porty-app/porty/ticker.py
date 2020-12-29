@@ -1,4 +1,4 @@
-from follow import follow
+from .follow import follow
 import csv
 
 def convert_types(rows, types):

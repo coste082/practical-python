@@ -1,4 +1,4 @@
-from typedproperty import String, Integer, Float
+from .typedproperty import String, Integer, Float
 
 class Stock:
     '''
@@ -15,6 +15,13 @@ class Stock:
 
     def sell(self,sell_amount):
         self.shares = self.shares - sell_amount
+
+    @property
+    def cost(self):
+        '''
+        Return the cost as shares*price
+        '''
+        return self.shares * self.price
 
     def update_prices(self,current_price):
         self.current_price = current_price

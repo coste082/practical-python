@@ -14,11 +14,8 @@ class Stock:
         self.name = name
         self.shares = shares
         self.price  = price
-
-    def __repr__(self):
-        return f'Stock({self.name!r}, {self.shares!r}, {self.price!r})'
-
-    @property
+        @property
+    
     def cost(self):
         '''
         Return the cost as shares*price
@@ -30,3 +27,7 @@ class Stock:
         Sell a number of shares and return the remaining number.
         '''
         self.shares -= nshares
+
+    def __repr__(self):
+        return f'Stock({self.name!r}, {self.shares!r}, {self.price!r})'
+

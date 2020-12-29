@@ -8,11 +8,11 @@ import time
 
 def select_columns(rows, indices):
     for row in rows:
-        yield [row[index] for index in indices]
+        yield (row[index] for index in indices)
 
 def convert_types(rows, types):
     for row in rows:
-        yield [func(val) for func, val in zip(types, row)]
+        yield (func(val) for func, val in zip(types, row))
 
 def make_dicts(rows, headers):
     for row in rows:
@@ -26,9 +26,7 @@ def parse_stock_data(lines):
     return rows
 
 def filter_symbols(rows, names):
-    for row in rows:
-        if row['name'] in names:
-            yield row
+    yield (row for row in rows if row['name'] in names)
 
 def ticker(portfile, logfile, fmt):
     portfolio = report.read_portfolio(portfile)

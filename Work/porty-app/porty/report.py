@@ -3,10 +3,10 @@
 # Exercise 2.4
 import pprint
 import csv
-from fileparse import parse_csv
-from stock import Stock
-from portfolio import Portfolio
-import tableformat
+from .fileparse import parse_csv
+from .stock import Stock
+from .portfolio import Portfolio
+from . import tableformat
 
 def print_portfolio(portfolio,formatter):
     '''

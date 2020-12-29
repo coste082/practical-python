@@ -3,6 +3,8 @@
 # Exercise 3.3
 import csv
 import gzip
+import logging
+log = logging.getLogger(__name__)
 
 def parse_csv(lines,select=None,types=None,has_headers=True,delimiter=','):
     '''
@@ -25,14 +27,17 @@ def parse_csv(lines,select=None,types=None,has_headers=True,delimiter=','):
     else:
         select = headers
         headers_select = headers
-
     type_conversions = [type_dict[i] for i in headers_select]
     indices = [headers.index(i) for i in headers if i in select]
-    for row in rows:
+    for rowno,row in enumerate(rows):
         if not row:
             continue
         row_select=[r for i,r in enumerate(row) if i in indices]
-        row_select = [type_conversions[i](r) for i,r in enumerate(row_select)]
+        try:
+            row_select = [type_conversions[i](r) for i,r in enumerate(row_select)]
+        except ValueError as e:
+            log.warning('Row {}: Could not convert {}'.format(rowno,row))
+            log.debug('Row {}: Reason {}'.format(rowno,e))
         record = dict(zip(headers_select,row_select))
         records.append(record)
     return records

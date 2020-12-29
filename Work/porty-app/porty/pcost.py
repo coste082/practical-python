@@ -2,9 +2,9 @@
 #
 # Exercise 1.27
 
-from fileparse import parse_csv
-from stock import Stock
-import report
+from .fileparse import parse_csv
+from .stock import Stock
+from . import report
 
 def portfolio_cost(datafile='Data/portfolio.csv'):
     with open(datafile,'rt') as f:
